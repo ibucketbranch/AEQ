@@ -1,0 +1,252 @@
+<title>AEQ Grid-2Q: gpt-5.6 Refresh</title>
+<style>
+  .viz-root {
+    --surface-1: #fcfcfb; --page: #f9f9f7; --ink-1: #0b0b0b; --ink-2: #52514e;
+    --ink-muted: #898781; --hairline: #e1e0d9; --border: rgba(11,11,11,0.10);
+    --accent: #2a78d6; --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-550: #1c5cab;
+    --good: #0ca30c; --good-text: #006300; --critical: #d03b3b; --warning: #fab219;
+    --tile: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1: #1a1a19; --page: #0d0d0d; --ink-1: #ffffff; --ink-2: #c3c2b7;
+      --ink-muted: #898781; --hairline: #2c2c2a; --border: rgba(255,255,255,0.10);
+      --accent: #3987e5; --seq-100: #10365c; --seq-250: #184f95; --seq-550: #5598e7;
+      --good: #0ca30c; --good-text: #0ca30c; --critical: #d03b3b; --warning: #fab219;
+      --tile: #222221;
+    }
+  }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--ink-1); margin: 0;
+    padding: 32px 20px 48px; line-height: 1.45;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  header .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; color: var(--ink-muted); font-weight: 600; margin-bottom: 6px; }
+  header h1 { font-size: 26px; margin: 0 0 10px; text-wrap: balance; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 12px; color: var(--ink-2); background: var(--surface-1); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .chip b { color: var(--ink-1); font-weight: 600; }
+
+  .verdict { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .verdict-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .verdict-head .big { font-size: 20px; font-weight: 700; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; color: #fff; }
+  .pill.pass { background: var(--good); }
+  .verdict p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 72ch; }
+  .verdict p b { color: var(--ink-1); }
+
+  section h2 { font-size: 15px; margin: 0 0 4px; }
+  section .sub { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; max-width: 72ch; }
+
+  .rank { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .rank-tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 5px; }
+  .rank-tile .who { font-size: 13px; font-weight: 700; }
+  .rank-tile .who small { color: var(--ink-muted); font-weight: 400; display: block; }
+  .rank-tile .score { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-tile .bar { height: 6px; border-radius: 3px; background: var(--hairline); overflow: hidden; }
+  .rank-tile .bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+  .rank-tile .note { font-size: 12px; color: var(--ink-2); }
+
+  .matrix-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .matrix-scroll { overflow-x: auto; }
+  .matrix { display: grid; grid-template-columns: minmax(140px, 1.3fr) repeat(5, minmax(90px, 1fr)); gap: 2px; min-width: 640px; }
+  .matrix .h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 600; padding: 6px; }
+  .matrix .rowlab { font-size: 13px; padding: 10px 8px 10px 0; display: flex; flex-direction: column; }
+  .matrix .rowlab small { color: var(--ink-muted); font-size: 11px; }
+  .cell { border-radius: 4px; padding: 10px 6px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 13px; position: relative; cursor: default; color: #fff; }
+  .cell.p3 { background: var(--seq-550); }
+  .cell.p2 { background: var(--seq-250); color: var(--ink-1); }
+  .cell.p1 { background: var(--seq-100); color: var(--ink-1); }
+  .cell.p0 { background: var(--tile); color: var(--ink-1); border: 1px solid var(--critical); }
+  .cell .tip { display: none; position: absolute; z-index: 5; left: 50%; transform: translateX(-50%); bottom: calc(100% + 6px); width: 250px; background: var(--ink-1); color: var(--page); font-size: 12px; font-weight: 400; text-align: left; border-radius: 6px; padding: 8px 10px; line-height: 1.4; }
+  .cell:hover .tip, .cell:focus .tip { display: block; }
+  .cell.tip-below .tip { bottom: auto; top: calc(100% + 6px); }
+  .legend { display: flex; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--ink-2); align-items: center; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--border); }
+
+  table.econ { border-collapse: collapse; width: 100%; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 13px; }
+  .econ-scroll { overflow-x: auto; border-radius: 10px; }
+  table.econ th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--hairline); }
+  table.econ td { padding: 9px 12px; border-bottom: 1px solid var(--hairline); font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; }
+  table.econ tr:last-child td { border-bottom: none; }
+  table.econ td:first-child { color: var(--ink-1); font-weight: 600; }
+
+  .findings { display: flex; flex-direction: column; gap: 10px; }
+  .find { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; border-left: 3px solid var(--accent); }
+  .find.trap { border-left-color: var(--critical); }
+  .find .t { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .find p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 74ch; }
+  .find p b { color: var(--ink-1); }
+
+  details { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; }
+  details summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+  details .inner { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  details p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 74ch; }
+
+  footer { font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--hairline); padding-top: 14px; }
+  footer b { color: var(--ink-2); }
+</style>
+<div class="viz-root">
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">AEQ Grid-2Q &middot; v1.3 Model Refresh &middot; Reproducible + Priceable</div>
+  <h1>The whole comparison, re-run on models that will still exist next month</h1>
+  <div class="meta">
+    <span class="chip">Completed <b>2026-07-24 20:30 UTC</b></span>
+    <span class="chip">Frontier <b>gpt-5.6-sol</b> &middot; Nano <b>gpt-5.6-luna</b></span>
+    <span class="chip">Judges <b>opus-4-8</b> + <b>gpt-5.6-sol</b> (cross-family both ways)</span>
+    <span class="chip">All hosted prices verified 2026-07-24</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <div class="verdict-head">
+    <span class="big">Calibration</span>
+    <span class="pill pass">&#10003; PASS under v1.3 accounting</span>
+  </div>
+  <p><b>Achievability:</b> gpt-5.6-sol went a perfect 12/12 on the non-trap classes. <b>Discrimination:</b> luna failed exactly 2 of 15, both on the trap. And the headline inversion: <b>the nano tier outscored the frontier overall, 13 to 12</b>, because CHIL-005 fooled sol all three times while luna resisted it once, at a fifth of sol's price.</p>
+</div>
+
+<section>
+  <h2>Overall rubric pass rate</h2>
+  <div class="rank">
+    <div class="rank-tile">
+      <span class="who">gpt-5.6-luna <small>nano API</small></span>
+      <span class="score">87%</span>
+      <div class="bar"><i style="width:87%"></i></div>
+      <span class="note">13/15 &middot; $0.0030/query &middot; 5.6s</span>
+    </div>
+    <div class="rank-tile">
+      <span class="who">gpt-5.6-sol <small>frontier reference</small></span>
+      <span class="score">80%</span>
+      <div class="bar"><i style="width:80%"></i></div>
+      <span class="note">12/15 &middot; $0.0152/query &middot; 6.9s</span>
+    </div>
+    <div class="rank-tile">
+      <span class="who">qwen2.5:7b <small>local, Q4</small></span>
+      <span class="score">40%</span>
+      <div class="bar"><i style="width:40%"></i></div>
+      <span class="note">6/15 &middot; $0 &middot; 18.6s on-device</span>
+    </div>
+    <div class="rank-tile">
+      <span class="who">claude-haiku-4-5 <small>Anthropic mid API</small></span>
+      <span class="score">33%</span>
+      <div class="bar"><i style="width:33%"></i></div>
+      <span class="note">5/15 &middot; $0.0026 &middot; 3.6s (fastest)</span>
+    </div>
+    <div class="rank-tile">
+      <span class="who">llama3.2:3b <small>local, Q4</small></span>
+      <span class="score">27%</span>
+      <div class="bar"><i style="width:27%"></i></div>
+      <span class="note">4/15 &middot; $0 &middot; 8.1s on-device</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Pass matrix</h2>
+  <p class="sub">Passes out of 3 runs per cell, locked v1.1 rubric, v1.3 gate accounting. Hover imperfect cells.</p>
+  <div class="matrix-card">
+    <div class="matrix-scroll">
+    <div class="matrix">
+      <div class="h">Query class</div><div class="h">sol</div><div class="h">luna</div><div class="h">haiku-4-5</div><div class="h">qwen 7b</div><div class="h">llama 3b</div>
+
+      <div class="rowlab">Q1 retrieval <small>all 5 IDs + count</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p2" tabindex="0">2/3<span class="tip">One run omitted PUMP-009 and misattributed the overdue count.</span></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p1" tabindex="0">1/3<span class="tip">Finally stated the count of 12 in one run; the other two repeated yesterday's identical omission.</span></div>
+
+      <div class="rowlab">Q2 analytical <small>top two in order</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Ordering and support were right every run, but it attributed the $46,800 figure to the wrong asset set all three times: fabricated-number failures, not ranking failures.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">The identical near-miss as yesterday, three more times: correct top two, only BOIL-001 named in support.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Omitted PUMP-003 and HVAC-007 entirely, same as every prior run.</span></div>
+
+      <div class="rowlab">Q3 synthesis <small>no fabricated stats</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Overstated the failure predictions and misattributed cost figures in each run: same fabrication family as its Q2 misses.</span></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">The identical "$86,400 to $0" fabrication, now reproduced across two days and two judge configurations.</span></div>
+
+      <div class="rowlab">Q4 distractor traps <small>reported, not gated (v1.3)</small></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">The new frontier fell for CHIL-005 all three runs, concluding a count of 13. The trap now beats a model generation newer than the one it was designed against.</span></div>
+      <div class="cell p1" tabindex="0">1/3<span class="tip">Luna resisted the trap once: the only hosted-model pass on Q4 in this run.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Added CHIL-005 every run; one run also mishandled GEN-009's decommission status.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Added CHIL-005 and removed FAN-012, as before.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Added PUMP-014, removed FAN-012, self-contradicted on CHIL-005.</span></div>
+
+      <div class="rowlab">Q5 derived math <small>3 steps, ugly division</small></div>
+      <div class="cell p3 tip-below">3/3</div>
+      <div class="cell p3 tip-below">3/3</div>
+      <div class="cell p3 tip-below" tabindex="0">3/3<span class="tip">Haiku's one clean class: all three derivations correct.</span></div>
+      <div class="cell p0 tip-below" tabindex="0">0/3<span class="tip">The same fabricated $58,500 / $27,900 / 2.10 triple as yesterday, digit for digit, under a different judge and frontier.</span></div>
+      <div class="cell p3 tip-below">3/3</div>
+    </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--seq-550)"></span>3/3</span>
+      <span><span class="sw" style="background:var(--seq-250)"></span>2/3</span>
+      <span><span class="sw" style="background:var(--seq-100)"></span>1/3</span>
+      <span><span class="sw" style="background:var(--tile); border-color:var(--critical)"></span>0 passed</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Economics, verified prices</h2>
+  <p class="sub">Every hosted price below was checked against the official pricing pages on 2026-07-24. The sol-to-luna cost delta is 5.1x at matched-or-better pass rate.</p>
+  <div class="econ-scroll">
+  <table class="econ">
+    <tr><th>Model</th><th>Pass rate</th><th>Cost / query</th><th>Latency</th><th>List price (in/out per MTok)</th><th>Runs where</th></tr>
+    <tr><td>gpt-5.6-luna</td><td>13/15 (87%)</td><td>$0.0030</td><td>5.6s</td><td>$1.00 / $6.00</td><td>OpenAI API</td></tr>
+    <tr><td>gpt-5.6-sol</td><td>12/15 (80%)</td><td>$0.0152</td><td>6.9s</td><td>$5.00 / $30.00</td><td>OpenAI API</td></tr>
+    <tr><td>qwen2.5:7b (Q4)</td><td>6/15 (40%)</td><td>$0</td><td>18.6s</td><td>local weights</td><td>your Mac</td></tr>
+    <tr><td>claude-haiku-4-5</td><td>5/15 (33%)</td><td>$0.0026</td><td>3.6s</td><td>$1.00 / $5.00</td><td>Anthropic API</td></tr>
+    <tr><td>llama3.2:3b (Q4)</td><td>4/15 (27%)</td><td>$0</td><td>8.1s</td><td>local weights</td><td>your Mac</td></tr>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>What the refresh established</h2>
+  <div class="findings">
+    <div class="find trap">
+      <div class="t">The trap outlived the model generation it was built against</div>
+      <p>CHIL-005 was designed against gpt-5.2 and now beats gpt-5.6-sol <b>3 for 3</b>, while the cheaper luna resisted it once. Narrative-over-threshold judgment error is not a small-model or old-model quirk; it's a standing frontier failure mode your instrument detects on demand. This is the white paper's sharpest exhibit.</p>
+    </div>
+    <div class="find">
+      <div class="t">Deterministic failures survived a full model refresh</div>
+      <p>With a new frontier reference and partially new judging, qwen produced the <b>digit-for-digit identical</b> fabricated Q5 triple and the identical Q2 near-miss as yesterday, and llama repeated its "$86,400 to $0" fabrication. Failure fingerprints belong to the (model, query class) pair, not to the measurement setup. Certification transfers.</p>
+    </div>
+    <div class="find">
+      <div class="t">The efficiency story strengthened, with citable prices</div>
+      <p>Luna matched or beat sol everywhere except nothing (13 vs 12 overall) at <b>5.1x lower measured cost</b>, and every dollar figure traces to a same-day official price. The old runs' "cheap tier passes" claim now has a reproducible, priceable successor, and the cost delta sits right at the pre-registered 5x GREEN threshold.</p>
+    </div>
+    <div class="find">
+      <div class="t">Haiku's failure mode is attribution, not reasoning</div>
+      <p>Re-judged with a working cross-family judge, haiku got orderings and derivations right but repeatedly <b>attached true numbers to the wrong entities</b> (the $46,800 overdue figure applied to a list including non-overdue assets). A distinct failure family the rubric's no-fabrication criteria catch cleanly.</p>
+    </div>
+  </div>
+</section>
+
+<details>
+  <summary>Prior runs (2026-07-23/24, deprecated-model generation), kept for the record</summary>
+  <div class="inner">
+    <p><b>Calibration runs 1-2 (gpt-5.2 era):</b> rubric v1.0 saturated; v1.1 passed on merit (frontier 14/15, nano 5/15 failed). Judge self-contradictions eliminated by the fail-confirmation protocol.</p>
+    <p><b>Five-model run:</b> gpt-5.2 93%, gpt-5-nano 83%, haiku 47%, qwen 40%, llama 20%. Superseded by this refresh for publication (models deprecated, prices unverifiable); retained as evidence of cross-generation reproducibility.</p>
+    <p><b>Phase 1 quantization (still current, models are pinned local weights):</b> llama3.2:3b Q4 beat its own fp16 parent 3-0; the fp16 fabricated an entire per-asset cost table on Q5 while the Q4 computed correctly. Compression cost nothing measurable at 3B and bought a 2.3x speedup. Data: experiments/grid2q/phase1_2026-07-24/.</p>
+  </div>
+</details>
+
+<footer>
+  <b>Judge-bug disclosure:</b> haiku's cells were initially voided by an OpenAI-judge parameter bug (gpt-5.6-sol rejects non-default temperature); its answers were preserved and re-adjudicated with the fixed judge, and the fix is committed. &nbsp;&middot;&nbsp; Sources: experiments/grid2q/refresh_gpt56_2026-07-24/ &middot; pre-registrations v1.0-v1.3 in whitepaper/ &middot; AEQ_Lessons_Ledger.md
+</footer>
+
+</div>
+</div>

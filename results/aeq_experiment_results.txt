@@ -1,0 +1,75 @@
+# AEQ EXPERIMENT RESULTS
+# Generated: 2026-03-03 23:36:00
+# Model: gpt-4o-mini | Temperature: 0
+# Query: "What are the critical assets in the portfolio?"
+# Methodology: experiments/STUDY-DESIGN.md
+
+=================================================================
+RUN — OPTIMIZED (AEQ-recommended)
+=================================================================
+- System prompt tokens: 48
+- Total input tokens:   2,403
+- Total output tokens:  53
+- Total tokens:         2,456
+- Tool calls made:      1
+- Tools called:         query_assets
+- Total cost:           $0.000219
+- Response time:        2.9s
+- Prompt overhead:      2.0%
+- Answer (excerpt):     There are 12 critical assets in the portfolio, with a total acquisition value of $1,274,000 and an average health score of 42.7 out of 100....
+
+=================================================================
+RUN — TUTORIAL (doc pattern)
+=================================================================
+- System prompt tokens: 122
+- Total input tokens:   2,551
+- Total output tokens:  70
+- Total tokens:         2,621
+- Tool calls made:      1
+- Tools called:         query_assets
+- Total cost:           $0.000338
+- Response time:        2.48s
+- Prompt overhead:      4.7%
+- Answer (excerpt):     There are 12 critical assets in the portfolio, with a total acquisition value of $1,274,000. The average health score of these assets is 42.7 out of 100. If you need more details about these assets, p...
+
+=================================================================
+RUN — ENTERPRISE (governance-heavy)
+=================================================================
+- System prompt tokens: 271
+- Total input tokens:   2,849
+- Total output tokens:  108
+- Total tokens:         2,957
+- Tool calls made:      1
+- Tools called:         query_assets
+- Total cost:           $0.000291
+- Response time:        4.01s
+- Prompt overhead:      9.2%
+- Answer (excerpt):     ### Critical Assets Overview
+
+- **Total Number of Critical Assets**: 12
+- **Total Acquisition Value**: $1,274,000
+- **Average Health Score**: 42.7/100
+
+This indicates that all identified assets are cu...
+
+=================================================================
+COMPARISON (vs Optimized)
+=================================================================
+
+  TUTORIAL (doc pattern):
+    Token ratio:  1.07x
+    Cost ratio:   1.54x
+    Tool calls:   1 vs 1
+
+  ENTERPRISE (governance-heavy):
+    Token ratio:  1.2x
+    Cost ratio:   1.32x
+    Tool calls:   1 vs 1
+
+## SCALED (50,000 queries/month)
+
+  OPTIMIZED (AEQ-recommended): $10.97/mo
+  TUTORIAL (doc pattern): $16.91/mo
+  ENTERPRISE (governance-heavy): $14.53/mo
+
+  Annual savings (Optimized vs Enterprise): $42.66

@@ -1,0 +1,90 @@
+# AEQ DUAL-PROVIDER RESULTS  (2026-07-23 18:26:59)
+# Query: "What are the critical assets in the portfolio?"  |  Temperature: 0
+# Thesis: efficiency pattern (optimized<<moderate<<severe) should hold on BOTH vendors.
+
+
+======================================================================
+PHASE 2 — REAL API  [tokens, cost, latency ALL MEASURED]
+======================================================================
+
+--- ANTHROPIC (claude-haiku-4-5) ---
+
+  OPTIMIZED
+    total tokens     : 2295.4   [MEASURED]
+    tool calls       : 1
+    prompt overhead  : 2.1%
+    latency          : 4.048s   [MEASURED — does not deflate]
+    cost/query       : $0.003345
+    reliability      : consistency=5/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'HVAC-007', 'PUMP-003', 'PUMP-009']
+    vs optimized     : 1.0x tokens, 1.0x cost, 1.0x latency
+
+  MODERATE_BLOAT
+    total tokens     : 2641   [MEASURED]
+    tool calls       : 1
+    prompt overhead  : 3.3%
+    latency          : 4.716s   [MEASURED — does not deflate]
+    cost/query       : $0.004709
+    reliability      : consistency=5/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'HVAC-007', 'PUMP-003', 'PUMP-009']
+    vs optimized     : 1.15x tokens, 1.41x cost, 1.17x latency
+
+  SEVERE_BLOAT
+    total tokens     : 4674.8   [MEASURED]
+    tool calls       : 3
+    prompt overhead  : 10.2%
+    latency          : 7.34s   [MEASURED — does not deflate]
+    cost/query       : $0.008732
+    reliability      : consistency=3/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'GEN-004', 'HVAC-007', 'PUMP-003', 'PUMP-009']
+    vs optimized     : 2.04x tokens, 2.61x cost, 1.81x latency
+
+--- OPENAI (gpt-4o-mini-2024-07-18) ---
+
+  OPTIMIZED
+    total tokens     : 858   [MEASURED]
+    tool calls       : 1
+    prompt overhead  : 5.6%
+    latency          : 3.885s   [MEASURED — does not deflate]
+    cost/query       : $0.000216
+    reliability      : consistency=5/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'HVAC-007', 'PUMP-003', 'PUMP-009']
+    vs optimized     : 1.0x tokens, 1.0x cost, 1.0x latency
+
+  MODERATE_BLOAT
+    total tokens     : 1079   [MEASURED]
+    tool calls       : 1
+    prompt overhead  : 8.1%
+    latency          : 3.992s   [MEASURED — does not deflate]
+    cost/query       : $0.000313
+    reliability      : consistency=5/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'HVAC-007', 'PUMP-003', 'PUMP-009']
+    vs optimized     : 1.26x tokens, 1.45x cost, 1.03x latency
+
+  SEVERE_BLOAT
+    total tokens     : 4725.2   [MEASURED]
+    tool calls       : 3
+    prompt overhead  : 10.1%
+    latency          : 10.119s   [MEASURED — does not deflate]
+    cost/query       : $0.001072
+    reliability      : consistency=5/5 runs agree on asset set ['BOIL-001', 'COMP-002', 'CONV-006', 'GEN-004', 'HVAC-007', 'HVAC-015', 'PUMP-003', 'PUMP-009', 'PUMP-011']
+    vs optimized     : 5.51x tokens, 4.97x cost, 2.6x latency
+
+======================================================================
+CROSS-VENDOR — IS THE WASTE ARCHITECTURAL?
+======================================================================
+
+  moderate_bloat token-ratio vs optimized:
+    anthropic : 1.15x
+    openai    : 1.26x
+    → pattern holds on all vendors: True
+
+  severe_bloat token-ratio vs optimized:
+    anthropic : 2.04x
+    openai    : 5.51x
+    → pattern holds on all vendors: True
+
+  If the ratios point the same direction on both vendors, the inefficiency
+  is a property of the ARCHITECTURE, not the model. That is the AEQ claim.
+
+======================================================================
+AEQ = Business Value Delivered / Tokens Consumed.
+Same 12 critical assets + same recommendation across architectures = equal value.
+Token/latency deltas are therefore pure architectural waste.
+Labels: [MEASURED] = from API. [EST] = estimated, disclosed. Never mixed silently.
+======================================================================

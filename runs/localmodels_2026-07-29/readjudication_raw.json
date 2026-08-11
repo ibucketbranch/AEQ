@@ -1,0 +1,18 @@
+[
+ {
+  "run": 2,
+  "pass": false,
+  "failed_criteria": [
+   "judge_parse_failure"
+  ],
+  "notes": "Checking rubric elements:\n\n(a) count = 12: \u2713\n(b) all five IDs present: PUMP-003, HVAC-007, COMP-002, BOIL-001, PUMP-009 all present \u2713\n(c) no contradicting IDs/counts. Candidate lists GEN-004, CONV-006"
+ },
+ {
+  "run": 3,
+  "pass": false,
+  "failed_criteria": [
+   "(c) contains no asset IDs or counts contradicting the evidence"
+  ],
+  "notes": "Count 12 is stated and all five required IDs are cited, but the candidate says '6 critical assets are not identified' while listing 7 (leaving only 5 unnamed), contradicting the evidence."
+ }
+]

@@ -1,0 +1,263 @@
+<title>Grid-2Q Phase 1: Quantized vs Parent</title>
+<style>
+  .viz-root {
+    --surface-1: #fcfcfb; --page: #f9f9f7; --ink-1: #0b0b0b; --ink-2: #52514e;
+    --ink-muted: #898781; --hairline: #e1e0d9; --border: rgba(11,11,11,0.10);
+    --accent: #2a78d6; --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-550: #1c5cab;
+    --good: #0ca30c; --good-text: #006300; --critical: #d03b3b; --warning: #fab219;
+    --tile: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1: #1a1a19; --page: #0d0d0d; --ink-1: #ffffff; --ink-2: #c3c2b7;
+      --ink-muted: #898781; --hairline: #2c2c2a; --border: rgba(255,255,255,0.10);
+      --accent: #3987e5; --seq-100: #10365c; --seq-250: #184f95; --seq-550: #5598e7;
+      --good: #0ca30c; --good-text: #0ca30c; --critical: #d03b3b; --warning: #fab219;
+      --tile: #222221;
+    }
+  }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--ink-1); margin: 0;
+    padding: 32px 20px 48px; line-height: 1.45;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  header .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; color: var(--ink-muted); font-weight: 600; margin-bottom: 6px; }
+  header h1 { font-size: 26px; margin: 0 0 10px; text-wrap: balance; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 12px; color: var(--ink-2); background: var(--surface-1); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .chip b { color: var(--ink-1); font-weight: 600; }
+
+  .verdict { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .verdict-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .verdict-head .big { font-size: 20px; font-weight: 700; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; color: #fff; }
+  .pill.red { background: var(--critical); }
+  .pill.twist { background: var(--good); }
+  .verdict p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 72ch; }
+  .verdict p b { color: var(--ink-1); }
+
+  section h2 { font-size: 15px; margin: 0 0 4px; }
+  section .sub { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; max-width: 72ch; }
+
+  .matrix-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .matrix-scroll { overflow-x: auto; }
+  .matrix { display: grid; grid-template-columns: minmax(140px, 1.3fr) repeat(3, minmax(100px, 1fr)); gap: 2px; min-width: 520px; }
+  .matrix .h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 600; padding: 6px; }
+  .matrix .rowlab { font-size: 13px; padding: 10px 8px 10px 0; display: flex; flex-direction: column; }
+  .matrix .rowlab small { color: var(--ink-muted); font-size: 11px; }
+  .cell { border-radius: 4px; padding: 10px 6px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 13px; position: relative; cursor: default; color: #fff; }
+  .cell.p3 { background: var(--seq-550); }
+  .cell.p2 { background: var(--seq-250); color: var(--ink-1); }
+  .cell.p0 { background: var(--tile); color: var(--ink-1); border: 1px solid var(--critical); }
+  .cell .tip { display: none; position: absolute; z-index: 5; left: 50%; transform: translateX(-50%); bottom: calc(100% + 6px); width: 250px; background: var(--ink-1); color: var(--page); font-size: 12px; font-weight: 400; text-align: left; border-radius: 6px; padding: 8px 10px; line-height: 1.4; }
+  .cell:hover .tip, .cell:focus .tip { display: block; }
+  .cell.tip-below .tip { bottom: auto; top: calc(100% + 6px); }
+  .legend { display: flex; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--ink-2); align-items: center; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--border); }
+
+  .duel { display: flex; flex-direction: column; gap: 14px; }
+  .duel-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .duel-card .q { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .duel-card .q small { color: var(--ink-muted); font-weight: 400; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .ans { border: 1px solid var(--hairline); border-radius: 8px; padding: 10px 12px; background: var(--tile); display: flex; flex-direction: column; gap: 6px; }
+  .ans .who { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+  .badge { font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 8px; color: #fff; }
+  .badge.pass { background: var(--good); }
+  .badge.fail { background: var(--critical); }
+  .ans pre { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; line-height: 1.5; white-space: pre-wrap; color: var(--ink-2); max-height: 210px; overflow-y: auto; }
+  .ans .note { font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--hairline); padding-top: 6px; }
+  .ans .note b { color: var(--ink-1); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .tile .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; }
+  .tile .val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tile .note { font-size: 12px; color: var(--ink-2); }
+
+  .flag { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: 10px; padding: 14px 16px; }
+  .flag .t { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .flag p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 74ch; }
+  .flag p b { color: var(--ink-1); }
+  .flags { display: flex; flex-direction: column; gap: 10px; }
+
+  details { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; }
+  details summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+  details .inner { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  details p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 74ch; }
+
+  footer { font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--hairline); padding-top: 14px; }
+  footer b { color: var(--ink-2); }
+</style>
+<div class="viz-root">
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">AEQ Grid-2Q &middot; Phase 1 &middot; Quantization Experiment</div>
+  <h1>Same model, two precisions: what did compression actually cost?</h1>
+  <div class="meta">
+    <span class="chip">Completed <b>2026-07-24 06:05 UTC</b></span>
+    <span class="chip">Parent <b>llama3.2:3b fp16</b> (6.4 GB)</span>
+    <span class="chip">Quantized <b>llama3.2:3b Q4_K_M</b> (2.0 GB)</span>
+    <span class="chip">Reference <b>gpt-5.2</b> &middot; Judge <b>opus-4-8</b></span>
+    <span class="chip">Mac mini M4 &middot; Ollama</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <div class="verdict-head">
+    <span class="big">Result</span>
+    <span class="pill red">RED per locked gates</span>
+    <span class="pill twist">Quantization cost: zero</span>
+  </div>
+  <p><b>The registered verdict is RED</b>: aggregate pass rate for the two local tiers was 10%, far under the 40% floor, exactly the floor effect the v1.2 amendment predicted for a 3B model against a frontier-calibrated rubric.</p>
+  <p><b>The finding inside the RED:</b> the quantized copy passed 3 of 15 cells; its own full-precision parent passed 0 of 15. Compression did not degrade this model on this workload; the 3.2x-smaller, 2.3x-faster Q4 build did everything the fp16 build did and aced the derived-math class the fp16 fabricated. At this scale <b>the model is the limit, not the precision</b>, and the certification instrument caught every failure either way.</p>
+</div>
+
+<section>
+  <h2>Pass matrix</h2>
+  <p class="sub">Passes out of 3 runs per cell, v1.1 rubric. Hover cells for the failure story.</p>
+  <div class="matrix-card">
+    <div class="matrix-scroll">
+    <div class="matrix">
+      <div class="h">Query class</div><div class="h">gpt-5.2 (reference)</div><div class="h">fp16 parent</div><div class="h">Q4 quantized</div>
+
+      <div class="rowlab">Q1 retrieval <small>all 5 IDs + count</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Listed all five assets correctly every run but never stated the count of 12. Identical miss to the Q4 build.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Same narrow miss as the parent, all three runs: right assets, count never stated. Behavior preserved through compression.</span></div>
+
+      <div class="rowlab">Q2 analytical <small>top two in order</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Ranked BOIL-001 and COMP-002 on top and explicitly argued PUMP-003 out of the 30-day window: a confident, reasoned wrong ordering, three times.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Also led with BOIL-001 and COMP-002, but simply omitted PUMP-003 and HVAC-007 without the fp16's explicit exclusion argument.</span></div>
+
+      <div class="rowlab">Q3 synthesis <small>no fabricated stats</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Content was otherwise sound and accurate, but never characterized the portfolio as declining or at-risk. Failed one criterion, narrowly, three times.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Fabricated the same "$86,400 to $0" savings claim in all three runs, a failure mode its own parent did not have.</span></div>
+
+      <div class="rowlab">Q4 distractor traps <small>the boundary test</small></div>
+      <div class="cell p0" tabindex="0">0/2<span class="tip">Even the frontier reference fell for CHIL-005 both counted runs this time (one cell lost to an empty answer). See the integrity flag below.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Approved removing FAN-012 (active, health 48, genuinely critical) all three runs and fabricated numbers doing it.</span></div>
+      <div class="cell p0" tabindex="0">0/3<span class="tip">Removed FAN-012, added PUMP-014 (health 58), one run concluded the critical count is 10. The traps caught both precisions.</span></div>
+
+      <div class="rowlab">Q5 derived math <small>3 steps, ugly division</small></div>
+      <div class="cell p3 tip-below" tabindex="0">3/3<span class="tip">$9,360 / $5,657 / 1.65x: clean derivation every run.</span></div>
+      <div class="cell p0 tip-below" tabindex="0">0/3<span class="tip">Hallucinated an entire per-asset cost table (assigning invented dollar figures to specific assets), then computed $6,500 / $9,000 / 0.72 from its own fabrication. Three times, identically.</span></div>
+      <div class="cell p3 tip-below" tabindex="0">3/3<span class="tip">Pulled the right evidence values and did the seven-way division correctly every run: $9,360 / $5,714 / 1.65x. The compressed build beat its own parent here.</span></div>
+    </div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--seq-550)"></span>3/3</span>
+      <span><span class="sw" style="background:var(--tile); border-color:var(--critical)"></span>0 passed</span>
+      <span>Retention ratio (the registered headline): Q4 kept 100% of its parent's passes, and added three of its own.</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The answers, side by side</h2>
+  <p class="sub">The derived-math question is the starkest case: the full-precision parent invented data; the quantized copy did the math.</p>
+  <div class="duel">
+    <div class="duel-card">
+      <div class="q">Q5: average maintenance cost, overdue vs non-overdue critical assets, and the ratio <small>(correct: $9,360 / $5,657 / 1.65x)</small></div>
+      <div class="answers">
+        <div class="ans">
+          <span class="who">fp16 parent <span class="badge fail">FAIL x3</span></span>
+          <pre>Critical assets:
+- PUMP-003 | $7,200 (overdue)
+- HVAC-007 | $6,600 (overdue)
+- BOIL-001 | $8,400 (overdue)
+- COMP-002 | $5,800 (overdue)
+- GEN-004  | $4,700 (overdue)
+
+Average overdue: $6,500
+Average non-overdue: $9,000
+Ratio: 0.72</pre>
+          <div class="note"><b>Fabricated the entire table.</b> None of those per-asset dollar figures exist in the evidence. Then it computed confidently on its own invention, and even got the direction of the ratio backwards.</div>
+        </div>
+        <div class="ans">
+          <span class="who">Q4 quantized <span class="badge pass">PASS x3</span></span>
+          <pre>Overdue critical assets:
+$46,800 / 5 = $9,360 per asset
+
+Non-overdue:
+$86,400 - $46,800 = $39,600
+$39,600 / 7 = $5,714 per asset
+
+Ratio: $9,360 / $5,714 ≈ 1.65</pre>
+          <div class="note"><b>Correct, all three runs.</b> Pulled the real $46,800 line from the evidence, did the subtraction and the ugly seven-way division, matched the frontier's answer.</div>
+        </div>
+      </div>
+    </div>
+    <div class="duel-card">
+      <div class="q">Q2: which assets to prioritize in the next 30 days <small>(correct: PUMP-003 first, HVAC-007 second)</small></div>
+      <div class="answers">
+        <div class="ans">
+          <span class="who">fp16 parent <span class="badge fail">FAIL x3</span></span>
+          <pre>1. BOIL-001 | Boiler | Zone South
+   Health: 43 | Overdue: 258 days
+2. COMP-002 | Compressor | Building B
+   Health: 42 | Overdue: 216 days
+
+[explicitly excludes PUMP-003 from
+the 30-day window]</pre>
+          <div class="note"><b>Confidently argued the wrong ranking.</b> It reasoned PUMP-003 (risk 91.2, the clear top priority) out of scope entirely.</div>
+        </div>
+        <div class="ans">
+          <span class="who">Q4 quantized <span class="badge fail">FAIL x3</span></span>
+          <pre>1. BOIL-001 | Health: 43 | Critical
+   Overdue 258 days
+   Reason: High risk (79.3)
+2. COMP-002 | Health: 42 | Critical
+   Overdue 216 days
+   Reason: High risk (73.1)</pre>
+          <div class="note"><b>Same wrong picks, simpler failure.</b> It omitted the top two assets without the parent's elaborate justification. Both precisions share the underlying blind spot.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Economics on your hardware</h2>
+  <p class="sub">Both local tiers cost $0 per token; the price is seconds and gigabytes. Compression bought a 2.3x speedup and 3.2x less disk for zero measured capability loss.</p>
+  <div class="tiles">
+    <div class="tile"><span class="label">fp16 latency</span><span class="val">15.2s</span><span class="note">per answer, 6.4 GB on disk</span></div>
+    <div class="tile"><span class="label">Q4 latency</span><span class="val">6.6s</span><span class="note">per answer, 2.0 GB on disk</span></div>
+    <div class="tile"><span class="label">Frontier reference</span><span class="val">3.7s</span><span class="note">$0.0052 per query via API</span></div>
+    <div class="tile"><span class="label">Judge COGS</span><span class="val">$0.024</span><span class="note">per cell; 29 of 45 cells re-adjudicated</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Flags for the record</h2>
+  <div class="flags">
+    <div class="flag">
+      <div class="t">Frontier integrity dipped below the floor this run: 12/15 vs the 13 floor</div>
+      <p>gpt-5.2 fell for the CHIL-005 trap in both counted Q4 runs (plus one empty answer). Across runs the frontier's Q4 record is now 2/3, 2/3, 0/2: the urgent-note-vs-threshold trap fools even the reference model regularly. Either the rubric's strict reading stands (the definition is explicit in the evidence) and this is a genuine frontier weakness worth publishing, or the trap is ambiguous enough that a v1.3 wording pass should sharpen it. Decision belongs to the author before publication.</p>
+    </div>
+    <div class="flag">
+      <div class="t">The OpenAI models in this experiment series are deprecated</div>
+      <p>Verified against official pages on 2026-07-24: <b>gpt-5.2 shuts down 2026-08-10</b> (weeks away); gpt-5-mini and gpt-5-nano on 2026-12-11. Their prices are no longer publicly listed, so the dollar figures for OpenAI cells cannot be verified from public sources (Anthropic prices verified: opus $5/$25, haiku $1/$5 per MTok). Before the white paper ships, the headline experiments should be re-run on current models (gpt-5.6 family), both for verifiable pricing and so a skeptic can reproduce them.</p>
+    </div>
+  </div>
+</section>
+
+<details>
+  <summary>Earlier runs today (calibration and five-model comparison), kept for the record</summary>
+  <div class="inner">
+    <p><b>Calibration run 1 (v1.0 rubric):</b> saturated, one self-contradicting judge verdict; treated as failed, led to amendment v1.1.</p>
+    <p><b>Calibration run 2 (v1.1 rubric):</b> passed on merit: frontier 14/15, nano 5/15 failed. Gate to Phase 1 opened.</p>
+    <p><b>Five-model comparison:</b> gpt-5.2 93%, gpt-5-nano 83%, claude-haiku-4-5 47%, qwen2.5:7b 40%, llama3.2:3b 20%. Findings: the CHIL-005 trap caught every tier; failures are deterministic at temperature 0; capability is per-class, not per-size. Data: experiments/grid2q/multimodel_2026-07-24/.</p>
+  </div>
+</details>
+
+<footer>
+  <b>Bottom line for the white paper:</b> at the 3B scale, quantization was free: the compressed model retained 100% of its parent's rubric passes, gained three, and ran 2.3x faster. The open question that justifies the next experiment is whether that holds at 7B+ where the parent actually passes things. &nbsp;&middot;&nbsp; Sources: experiments/grid2q/phase1_2026-07-24/ &middot; pre-registration v1.0-v1.2 in whitepaper/
+</footer>
+
+</div>
+</div>

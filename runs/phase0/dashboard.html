@@ -1,0 +1,278 @@
+<title>Grid-2Q Phase 0 Calibration</title>
+<style>
+  .viz-root {
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --ink-1: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-muted: #898781;
+    --hairline: #e1e0d9;
+    --border: rgba(11,11,11,0.10);
+    --accent: #2a78d6;
+    --seq-250: #86b6ef;
+    --seq-400: #3987e5;
+    --seq-550: #1c5cab;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --critical: #d03b3b;
+    --warning: #fab219;
+    --tile: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --ink-1: #ffffff;
+      --ink-2: #c3c2b7;
+      --ink-muted: #898781;
+      --hairline: #2c2c2a;
+      --border: rgba(255,255,255,0.10);
+      --accent: #3987e5;
+      --seq-250: #184f95;
+      --seq-400: #2a78d6;
+      --seq-550: #5598e7;
+      --good: #0ca30c;
+      --good-text: #0ca30c;
+      --critical: #d03b3b;
+      --warning: #fab219;
+      --tile: #222221;
+    }
+  }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink-1);
+    margin: 0;
+    padding: 32px 20px 48px;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  header .eyebrow {
+    text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px;
+    color: var(--ink-muted); font-weight: 600; margin-bottom: 6px;
+  }
+  header h1 { font-size: 26px; margin: 0 0 10px; text-wrap: balance; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 12px; color: var(--ink-2); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px;
+    white-space: nowrap;
+  }
+  .chip b { color: var(--ink-1); font-weight: 600; }
+
+  .verdict {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .verdict-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .verdict-head .big { font-size: 20px; font-weight: 700; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+    border-radius: 999px; padding: 3px 10px; color: #fff;
+  }
+  .pill.warn { background: var(--warning); color: #3d2c00; }
+  .pill.fail { background: var(--critical); }
+  .gates { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .gate {
+    border: 1px solid var(--hairline); border-radius: 8px; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px; background: var(--tile);
+  }
+  .gate .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; }
+  .gate .val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gate .req { font-size: 12px; color: var(--ink-2); }
+  .ok  { color: var(--good-text); font-weight: 700; }
+  .bad { color: var(--critical); font-weight: 700; }
+  .verdict p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 68ch; }
+  .verdict p b { color: var(--ink-1); }
+
+  section h2 { font-size: 15px; margin: 0 0 4px; }
+  section .sub { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; max-width: 68ch; }
+
+  .matrix-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .matrix { display: grid; grid-template-columns: minmax(150px, 1.4fr) 1fr 1fr; gap: 2px; }
+  .matrix .h { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; padding: 6px 8px; }
+  .matrix .rowlab { font-size: 13px; color: var(--ink-1); padding: 10px 8px; display: flex; flex-direction: column; }
+  .matrix .rowlab small { color: var(--ink-muted); font-size: 11px; }
+  .cell {
+    border-radius: 4px; padding: 10px 8px; text-align: center; font-weight: 700;
+    font-variant-numeric: tabular-nums; font-size: 14px; position: relative; cursor: default;
+    color: #fff;
+  }
+  .cell.p3 { background: var(--seq-550); }
+  .cell.p2 { background: var(--seq-250); color: var(--ink-1); }
+  .cell .tip {
+    display: none; position: absolute; z-index: 5; left: 50%; transform: translateX(-50%);
+    bottom: calc(100% + 6px); width: 240px; background: var(--ink-1); color: var(--page);
+    font-size: 12px; font-weight: 400; text-align: left; border-radius: 6px; padding: 8px 10px;
+    line-height: 1.4;
+  }
+  .cell:hover .tip, .cell:focus .tip { display: block; }
+  .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--ink-2); align-items: center; flex-wrap: wrap; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .tile .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; }
+  .tile .val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tile .note { font-size: 12px; color: var(--ink-2); }
+  .bar { height: 6px; border-radius: 3px; background: var(--hairline); margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+
+  .fails { display: flex; flex-direction: column; gap: 10px; }
+  .fail-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; border-left: 3px solid var(--critical);
+  }
+  .fail-card.noise { border-left-color: var(--warning); }
+  .fail-card .where { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .fail-card .tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 1px 8px; border-radius: 999px; margin-left: 8px; vertical-align: 1px;
+  }
+  .tag.real { background: var(--critical); color: #fff; }
+  .tag.noiset { background: var(--warning); color: #3d2c00; }
+  .fail-card p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 72ch; }
+  .fail-card p b { color: var(--ink-1); }
+
+  footer { font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--hairline); padding-top: 14px; }
+  footer b { color: var(--ink-2); }
+</style>
+<div class="viz-root">
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">AEQ Grid-2Q &middot; Phase 0 &middot; Run 1</div>
+  <h1>Rubric calibration: can the hardened exam tell models apart?</h1>
+  <div class="meta">
+    <span class="chip">Completed <b>2026-07-24 01:38 UTC</b></span>
+    <span class="chip">Frontier <b>gpt-5.2</b></span>
+    <span class="chip">Nano <b>gpt-5-nano</b></span>
+    <span class="chip">Judge <b>claude-opus-4-8</b></span>
+    <span class="chip">30 cells &middot; 3 runs each</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <div class="verdict-head">
+    <span class="big">Gate result</span>
+    <span class="pill warn">&#9650; Nominal pass, treated as failed</span>
+  </div>
+  <div class="gates">
+    <div class="gate">
+      <span class="label">Achievability &middot; frontier must pass</span>
+      <span class="val">15 / 15 <span class="ok">OK</span></span>
+      <span class="req">Required: at least 13 of 15. The harder exam is fair.</span>
+    </div>
+    <div class="gate">
+      <span class="label">Discrimination &middot; nano must fail</span>
+      <span class="val">2 / 15 <span class="bad">contested</span></span>
+      <span class="req">Required: at least 2 failures. One of the two is a self-contradicting judge verdict; the confirmed count is 1, below the gate.</span>
+    </div>
+  </div>
+  <p><b>Reading:</b> the exam is fair but still can't reliably catch a weaker model. The two question classes built to discriminate (Q4 traps, Q5 math) were both aced by nano. Amendment v1.1 hardens both and adds a fail-confirmation protocol for the judge before recalibrating.</p>
+</div>
+
+<section>
+  <h2>Pass matrix</h2>
+  <p class="sub">Passes out of 3 runs per cell, judged against the pre-registered rubric. Hover a 2/3 cell for what failed.</p>
+  <div class="matrix-card">
+    <div class="matrix">
+      <div class="h">Query class</div><div class="h">Frontier (gpt-5.2)</div><div class="h">Nano (gpt-5-nano)</div>
+
+      <div class="rowlab">Q1 retrieval <small>tightened: all 5 IDs + count</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p2" tabindex="0">2/3
+        <span class="tip"><b>Run 2 failed (confirmed):</b> listed all five critical assets correctly but never stated the count of 12, which the tightened rubric requires.</span>
+      </div>
+
+      <div class="rowlab">Q2 analytical <small>tightened: top two in order</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p2" tabindex="0">2/3
+        <span class="tip"><b>Run 2 failed (judge noise):</b> the judge's own notes say "actually all criteria are met" yet it returned FAIL. Counted as adjudication error, not a real miss.</span>
+      </div>
+
+      <div class="rowlab">Q3 synthesis <small>tightened: no absent assets</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+
+      <div class="rowlab">Q4 distractor traps <small>new class, built to bite</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+
+      <div class="rowlab">Q5 derived math <small>new class, built to bite</small></div>
+      <div class="cell p3">3/3</div>
+      <div class="cell p3">3/3</div>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--seq-550)"></span>3 of 3 passed</span>
+      <span><span class="sw" style="background:var(--seq-250)"></span>2 of 3 passed</span>
+      <span>The two new classes (Q4, Q5) produced zero failures: that is the calibration problem.</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Run economics</h2>
+  <p class="sub">Nano remains far cheaper per query but pays for it in wall-clock time: it spent ~1,900 output tokens per answer (mostly hidden reasoning) against the frontier's ~220.</p>
+  <div class="tiles">
+    <div class="tile">
+      <span class="label">Mean cost / query</span>
+      <span class="val">$0.0044</span>
+      <span class="note">frontier</span>
+      <div class="bar"><i style="width:100%"></i></div>
+    </div>
+    <div class="tile">
+      <span class="label">Mean cost / query</span>
+      <span class="val">$0.0008</span>
+      <span class="note">nano &middot; 5.5x cheaper</span>
+      <div class="bar"><i style="width:18%"></i></div>
+    </div>
+    <div class="tile">
+      <span class="label">Mean latency</span>
+      <span class="val">3.7s</span>
+      <span class="note">frontier</span>
+      <div class="bar"><i style="width:39%"></i></div>
+    </div>
+    <div class="tile">
+      <span class="label">Mean latency</span>
+      <span class="val">9.5s</span>
+      <span class="note">nano &middot; 2.6x slower</span>
+      <div class="bar"><i style="width:100%"></i></div>
+    </div>
+    <div class="tile">
+      <span class="label">Total model spend</span>
+      <span class="val">$0.08</span>
+      <span class="note">30 answers, both tiers</span>
+    </div>
+    <div class="tile">
+      <span class="label">Total judge spend</span>
+      <span class="val">$0.40</span>
+      <span class="note">opus adjudication, 30 verdicts ($0.013 / cell)</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The two failures, examined</h2>
+  <p class="sub">Only one survives scrutiny, which is why the run is treated as a failed calibration despite the nominal gate pass.</p>
+  <div class="fails">
+    <div class="fail-card">
+      <div class="where">Q1 retrieval &middot; nano run 2 <span class="tag real">confirmed miss</span></div>
+      <p>The answer listed all five required critical assets with correct details but <b>never stated the total count of 12</b>. The tightened rubric requires the count explicitly. A genuine, if narrow, failure.</p>
+    </div>
+    <div class="fail-card noise">
+      <div class="where">Q2 analytical &middot; nano run 2 <span class="tag noiset">judge noise</span></div>
+      <p>The judge returned FAIL while its own notes read: <b>"PUMP-003 and HVAC-007 are ranked first and second correctly, quantitative signals cited, no fabricated numbers &mdash; actually all criteria are met."</b> A self-contradicting verdict, same failure class as the haiku judge errors in Grid-1, now in opus at lower frequency. Amendment v1.1 adds a fail-confirmation protocol: every FAIL gets an independent second opinion, majority rules on disagreement.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>Next:</b> amendment v1.1 (drafted, pending approval) removes the giveaway hint from Q4, adds a trap that punishes blanket rejection (FAN-012 genuinely belongs on the critical list), makes Q5 a three-step derivation with non-round numbers, then recalibrates. Estimated cost ~$0.50. &nbsp;&middot;&nbsp; Sources: experiments/grid2q/phase0/phase0_report.md and phase0_raw.json &middot; pre-registration AEQ_Grid2Q_PreRegistration_v1.md
+</footer>
+
+</div>
+</div>

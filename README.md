@@ -53,6 +53,8 @@ same substantive answer under a rubric fixed before the runs.
 | **Token ratio** | **1.0×** | **1.45×** | **4.68×** |
 | Cost ratio | 1.0× | 1.79× | 5.04× |
 
+![Same answer, 4.68x the tokens: three builds of one agent, optimized 345 tokens, moderate bloat 499, severe bloat 1,615](figures/token_spread_468.png)
+
 Then validated live on two vendors, five runs per architecture at temperature 0:
 
 | Vendor | Tokens | Cost | Latency |

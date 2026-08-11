@@ -161,7 +161,7 @@ Not published: the experiment harness, the reference agent implementation, and t
 authoring used in client engagements.
 
 **If you want AEQ run against your own agent workload, or want the harness rather than the
-method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [bucketbranch.ai](https://bucketbranch.ai)
+method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalderrama](https://x.com/mikevalderrama) · [bucketbranch.ai](https://bucketbranch.ai)
 
 ---
 

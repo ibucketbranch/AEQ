@@ -157,11 +157,14 @@ This repo contains the specification, the pre-registration series, the run recor
 lessons ledger. That is everything needed to understand the method, follow the reasoning, and check
 the results.
 
-Not published: the experiment harness, the reference agent implementation, and the rubric
-authoring used in client engagements.
+The phase-0 experiment harness is published in
+[aeq-local-model-brief](https://github.com/ibucketbranch/aeq-local-model-brief), with the exact
+invocation used for the local-models run. It takes any OpenAI-compatible endpoint as a system
+under test. Not published: the reference agent implementation and the rubric authoring used in
+client engagements.
 
-**If you want AEQ run against your own agent workload, or want the harness rather than the
-method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalderrama](https://x.com/mikevalderrama) · [bucketbranch.ai](https://bucketbranch.ai)
+**If you want AEQ run against your own agent workload, or want the rubrics written properly
+rather than the method alone:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalderrama](https://x.com/mikevalderrama) · [bucketbranch.ai](https://bucketbranch.ai)
 
 ---
 

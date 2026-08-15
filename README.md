@@ -179,7 +179,18 @@ method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalde
 
 <div align="center">
 
+### Where to go next
+
+| | |
+|---|---|
+| [**The Cost of a Question**](https://bucketbranch.ai/papers/cost-of-a-question/) | The white paper: what a per-seat license buys, measured against what the compute costs |
+| [**Same Model, Same Question, 4.68× the Tokens**](https://medium.com/@michael_valderrama/same-model-same-question-4-68x-the-tokens-455725b06add) | The method in plain terms |
+| [**The Agentic Loop, as an Economics Problem**](https://bucketbranch.ai/reference/agent-loop-economics/) | One page, for operators |
+| [**Cost-Aware Routing of Large Language Models**](https://github.com/ibucketbranch/MS-AAI-501-Final_Project_IntroAI) | The routing study: 2,434 held-out prompts, oracle to commercial router |
+
 **Michael Valderrama** · AI Agent Architect · Independent R&D © 2026
+
+[bucketbranch.ai](https://bucketbranch.ai) · [Medium](https://medium.com/@michael_valderrama) · [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X](https://x.com/mikevalderrama)
 
 *Token prices will keep falling. Your waste ratio stays exactly where your architecture put it.*
 

@@ -171,7 +171,8 @@ method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalde
 > series, and run reports.* https://github.com/ibucketbranch/AEQ
 
 - Plain-language writeup: [Same Model, Same Question, 4.68× the Tokens](https://medium.com/@michael_valderrama/same-model-same-question-4-68x-the-tokens-455725b06add)
-- Full methodology and white paper: [bucketbranch.ai](https://bucketbranch.ai/papers/agentic-architecture-enterprise-eam/)
+- Full methodology and white paper: [The Cost of a Question](https://bucketbranch.ai/papers/cost-of-a-question/)
+- System architecture reference (v2.1.0): [Agentic Architecture for Enterprise Asset Management](https://bucketbranch.ai/papers/agentic-architecture-enterprise-eam/)
 - Agent-loop economics reference: [bucketbranch.ai/reference/agent-loop-economics](https://bucketbranch.ai/reference/agent-loop-economics/)
 
 ---

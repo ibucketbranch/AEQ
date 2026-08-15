@@ -4,7 +4,8 @@
 **Author:** Michael Valderrama | AI Agent Architect | Independent R&D © 2026
 **Version:** 1.1 | August 2026
 **Status:** Sections 1–8 are validated by controlled experiment (single-turn), unchanged from v1.0. Section 2.1 (added in v1.1) is definitional, not experimental. Section 9 (AEQ-L) is PROPOSED, pending external validation.
-**Reference implementation:** github.com/ibucketbranch/AEQ
+**Specification, pre-registrations, and run records:** github.com/ibucketbranch/AEQ
+**Reference implementation:** not published (see the repository README for what is and is not released)
 **Terminology rule:** Use "AI Agents" or "Agentic Agents." Never "Agentic AI."
 
 ---

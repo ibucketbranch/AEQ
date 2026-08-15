@@ -158,7 +158,7 @@ lessons ledger. That is everything needed to understand the method, follow the r
 the results.
 
 The phase-0 experiment harness is published in
-[aeq-local-model-brief](https://github.com/ibucketbranch/aeq-local-model-brief), with the exact
+[quantized-agent-grid](https://github.com/ibucketbranch/quantized-agent-grid), with the exact
 invocation used for the local-models run. It takes any OpenAI-compatible endpoint as a system
 under test. Not published: the reference agent implementation and the rubric authoring used in
 client engagements.

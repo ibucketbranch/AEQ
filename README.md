@@ -151,17 +151,19 @@ parent failed. Capability is per-workload, not per-parameter-count.
 
 ---
 
-## What's here and what isn't
+## What's here, and where the code lives
 
-This repo contains the specification, the pre-registration series, the run records, and the
-lessons ledger. That is everything needed to understand the method, follow the reasoning, and check
-the results.
+This repo is the method: the specification, the pre-registration series, the run records, and the
+lessons ledger. Everything needed to understand the approach, follow the reasoning, and check the
+results.
 
-Not published: the experiment harness, the reference agent implementation, and the rubric
-authoring used in client engagements.
+The code is next door in [AgentSaaSy](https://github.com/ibucketbranch/AgentSaasy): the agent under
+test, its tools, and the Grid-2Q harness that produced the run records here.
 
-**If you want AEQ run against your own agent workload, or want the harness rather than the
-method:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalderrama](https://x.com/mikevalderrama) · [bucketbranch.ai](https://bucketbranch.ai)
+The rubrics are not a separate release. They are written into the pre-registrations in this repo,
+in full, before the runs they score. A rubric published after the result is not a rubric.
+
+**If you want AEQ run against your own agent workload:** [LinkedIn](https://www.linkedin.com/in/m-valderrama/) · [X @mikevalderrama](https://x.com/mikevalderrama) · [bucketbranch.ai](https://bucketbranch.ai)
 
 ---
 

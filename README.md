@@ -4,7 +4,7 @@
 
 **Two agents. Same model, same question, same answer. One spent 4.68× the tokens.**
 
-[![Spec](https://img.shields.io/badge/spec-v1.1-3FD0C9?style=flat-square)](spec/AEQ_Specification_v1.1.md)
+[![Spec](https://img.shields.io/badge/spec-v1.2-3FD0C9?style=flat-square)](spec/AEQ_Specification_v1.2.md)
 [![Method](https://img.shields.io/badge/method-pre--registered-6BA5E7?style=flat-square)](preregistrations/)
 [![Vendors](https://img.shields.io/badge/validated-2%20vendors-E8B54D?style=flat-square)](results/aeq_dual_results.txt)
 [![License](https://img.shields.io/badge/license-MIT-8FA3B8?style=flat-square)](LICENSE)
@@ -111,7 +111,7 @@ You can measure all three on your own agent this week without a vendor dashboard
 | [`figures/`](figures/) | Published figures |
 | [`AEQ_Lessons_Ledger.md`](AEQ_Lessons_Ledger.md) | Every defect the method caught in itself. Append-only |
 
-**Start here:** [the specification](spec/AEQ_Specification_v1.1.md), then
+**Start here:** [the specification](spec/AEQ_Specification_v1.2.md), then
 [the lessons ledger](AEQ_Lessons_Ledger.md).
 
 ---

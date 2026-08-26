@@ -88,6 +88,40 @@ Entries are append-only. Date format UTC.
 **Fix:** v1.3 splits the signals: achievability is computed on non-trap classes only (>= 11/12), and frontier trap performance is reported as a standalone finding.
 **Reusable rule:** deliberately adversarial classes must be excluded from instrument-health checks, or the instrument reports itself broken every time the trap works.
 
+## L12. A boundary that truncates silently returns a confident wrong answer (2026-08-25)
+
+**Broke:** three times, at three points in the same call, each returning output indistinguishable from a real result. A 6,401 token prompt was silently cut to the served context window and the model answered fluently from the tail, naming the single healthiest asset when asked for the worst. A completion hit its cap and returned an empty string, which the scorer recorded as a wrong answer and which read as a capability failure. And a generation ran past the window that prompt and completion share, at 8,377 in plus 8,007 out against 16,384, returning nothing while stopping 185 tokens short of the cap, so the cap guard never fired.
+**Detected by:** comparing tokens sent against tokens the server reported receiving, which is the only place the first loss is visible. The second and third were caught only because the guard tested for an empty answer as well as a cap hit. Written on the cap alone, as the obvious version would have been, it would have published the wasteful variant as answering that query incorrectly.
+**Fix:** four conditions void a cell rather than scoring it: prompt ratio below a declared floor, any call reaching max_tokens, an empty answer, and a pre-flight check refusing the cell when the prompt leaves less headroom than max_tokens. A voided cell is recorded as an error and retried, never scored. The guard's own advice was also wrong and was corrected: it said to raise max_tokens, which could not work, because there was no room for a larger cap.
+**Verified:** the prompt guard fires on the unpinned model and passes at 0.99 on the pinned one. The empty-answer guard caught the case the cap guard missed. At a 32,768 context the previously failing cell passes at 12,900 total tokens. One cell in a 90-cell arm voided at the cap and was reported rather than scored.
+**Reusable rule:** every boundary in a model call fails silently and each fails differently. Compare what you sent against what the server says it received, refuse to score any answer that is empty or truncated, and check before the call that the prompt leaves room for the completion, because prompt and completion share one window. A cell that hit a boundary is a broken cell, not a wrong answer, and scoring it as wrong understates capability while looking exactly like data.
+
+## L13. Score the answer, not the derivation (2026-08-25)
+
+**Broke:** six of ten scoring keys demanded values computed along the way rather than what the question asked. Asked for a combined annual cost, the model answered 9284, which was exactly right, and was marked wrong for not also listing the three assets it had summed. Queries naming an asset required the model to echo that identifier back, which measures instruction-following rather than retrieval, and the lean variant was instructed to reply with the figure only, complied, and was scored a failure for complying.
+**Detected by:** smoke testing the golden set against a real model before the measured run, rather than by reviewing the keys.
+**Fix:** each query declares an `answer_shape` of ids, figures, or both, and only that is scored. Values computed along the way are recorded as `figures_not_scored` or `asset_ids_not_scored` so they stay visible without being required. Identifiers appearing in the question text are removed from the required set and recorded separately.
+**Verified:** re-scoring answers already collected under the corrected key moved one model from fail to pass on the affected query and left the weaker model unchanged at 4 of 10, so that model's failures were real capability rather than a scoring artifact.
+**Reusable rule:** requiring a model to show its working turns a correct terse answer into a failure. The key contains what the question asks for and nothing else.
+
+## L14. Before calling hidden reasoning overhead, switch it off and rerun (2026-08-25)
+
+**Broke:** hidden completion tokens were treated as a distortion to be disclosed or corrected across three separate findings, on the assumption they were preamble. Nobody checked whether they could simply be disabled.
+**Detected by:** Michael asking whether conceding a third of the framework defeated the point of a three-layer metric. It was the right question and the assumption had never been tested.
+**Fix:** disable reasoning and rerun the same workload. Measured across ten queries on one model: eight held their answers at roughly a tenth of the completion tokens, and the two that broke were the only two requiring chained operations rather than a single pass over the data. The tokens were not padding, they were performing the second step.
+**Verified:** with reasoning disabled, three runs of the same cell produced identical completion counts, so the layer that had been reversing sign became deterministic and interpretable.
+**Reusable rule:** if accuracy holds without the hidden tokens they were overhead, and if accuracy drops they were work, and the token count was the price of the answer rather than waste. Test it before reporting either way.
+
+## L15. A metric that changes sign between two valid runs is unreported, not noisy (2026-08-25)
+
+**Broke:** the output-efficiency layer put a deliberately wasteful variant at 0.88x the optimized variant's output tokens on one query while that variant cost 1.82x in total. Read as a ranking, the layer named the wasteful architecture the efficient one. Averaging across queries would have replaced the reversal with a plausible single number.
+**Detected by:** comparing the layer against the total on the same cells instead of reporting it alone.
+**Fix:** report the spread across runs alongside the statistic, and compare each variant pairwise against the baseline per unit of work rather than testing a global spread across all variants.
+**Verified:** the first version of that check compared the maximum-minus-minimum spread against the largest standard deviation. The most verbose variant dominated the spread, the check reported the difference as real, and it hid the wasteful variant sitting below the baseline on half the queries. The pairwise version names all three inverted cells and correctly reports none in the arm where reasoning was disabled.
+**Reusable rule:** never test for a sign reversal with an aggregate that spans the things being compared, or the largest magnitude will swamp the reversal. An aggregate computed across a sign change reports a number and loses the fact.
+
 ---
 
 *Process note: entries L1-L6 each correspond to a recorded amendment or committed fix with a timestamp preceding the verifying run. That ordering is the point.*
+
+*Process note: L12-L15 come from the Blueberry AEQ Showcase, 2026-08-25, 180 measured cells across two arms under a pre-registration frozen before the first cell. Repository ibucketbranch/Blueberry, private. The gap between L11 (July) and L12 (August) is a phase boundary, not a dormant period: the Grid series and the showcase were separate pieces of work.*

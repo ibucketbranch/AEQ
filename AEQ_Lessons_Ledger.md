@@ -120,8 +120,26 @@ Entries are append-only. Date format UTC.
 **Verified:** the first version of that check compared the maximum-minus-minimum spread against the largest standard deviation. The most verbose variant dominated the spread, the check reported the difference as real, and it hid the wasteful variant sitting below the baseline on half the queries. The pairwise version names all three inverted cells and correctly reports none in the arm where reasoning was disabled.
 **Reusable rule:** never test for a sign reversal with an aggregate that spans the things being compared, or the largest magnitude will swamp the reversal. An aggregate computed across a sign change reports a number and loses the fact.
 
+## L16. An architecture comparison measures the specification unless granularity is held fixed (2026-08-27)
+
+**Broke:** builder-gauge reported a stateful planner 6.36x cheaper than a stateless loop. Same task, same engine, same pinned starting commit, same held-out suite, three repeats, and the gap cleanly exceeded the spread. Every safeguard the run had said the number was real. It was a property of how the PRD was written, not of the two architectures.
+**Detected by:** asking why the smaller task cost more than the larger one, which no architectural story explained. The two PRDs differed in size and in decomposition at the same time, and nothing in the matrix separated the two.
+**Fix:** a branch identical to the original except that six `- [ ]` checkboxes collapsed into one covering the same work, tests byte-identical, verified by diff. Pre-registered before collection, with the control stated in advance: the planner's cost should not move, and if it did the effect belonged to the model or the task rather than the architecture.
+**Verified:** the stateless loop moved 4.78x, finer being dearer, with the gap clear of the spread. The planner did not move, gap $0.17 against its own spread of $0.22. Holding the work constant and writing the specification coarsely took the arm-to-arm difference from 6.36x to 1.06x, under five cents. The original headline survived only as a statement about one PRD.
+**Reusable rule:** when comparing architectures that consume a specification, the specification's structure is an independent variable, and an uncontrolled one gets attributed to the architecture. Vary it deliberately with the work held constant, and register a control arm whose cost should not move. Without that control a granularity effect and an architecture effect are the same measurement. Note the direction this cuts: the finer decomposition came from following the tool's own documented best practice, so the guidance and the benchmark were confounded together.
+
+## L17. An unpriced model must raise, never default to zero (2026-08-27)
+
+**Broke:** the single most expensive cell in the matrix refused to book, because its transcript named a model the price table did not rate. The obvious convenience, treating an unknown rate as zero, would have booked that cell at a small fraction of its real cost and reported a clean number.
+**Detected by:** the ledger raising on the unrated model instead of defaulting it, which was written in before any cell ran for exactly this reason.
+**Fix:** inspected the transcript rather than guessing. The unrated name was an engine placeholder carrying zero in every token field, emitted when a run is interrupted. It was rated at zero because it is measurably zero, verified against the transcript, and the cell rebooked.
+**Verified:** the cell rebooked at $11.16. Reported cumulative spend went from $23.70 to $35.70, so the ledger had been understating by 32 percent, and the budget ceiling had been enforced against the understated figure the whole time.
+**Reusable rule:** an unknown rate is missing information, not a zero. Any accounting instrument must refuse to price what it cannot price, because a defaulted zero is indistinguishable from a genuinely free call and silently biases every total that contains it. The same applies to the ceiling: a budget guard enforced against an incomplete total is not a guard.
+
 ---
 
 *Process note: entries L1-L6 each correspond to a recorded amendment or committed fix with a timestamp preceding the verifying run. That ordering is the point.*
 
 *Process note: L12-L15 come from the Blueberry AEQ Showcase, 2026-08-25, 180 measured cells across two arms under a pre-registration frozen before the first cell. Repository ibucketbranch/Blueberry, private. The gap between L11 (July) and L12 (August) is a phase boundary, not a dormant period: the Grid series and the showcase were separate pieces of work.*
+
+*Process note: L16 and L17 come from builder-gauge, 2026-08-26 to 2026-08-27, a two-arm builder benchmark of 18 measured cells under a pre-registration frozen before the first cell, with a second pre-registration frozen before the granularity isolation in L16. Repository ibucketbranch/Blueberry, private; the benchmark target is ibucketbranch/loop-bench, also private, pinned by commit. Both entries are cost-accounting lessons rather than rubric lessons, which is a change of subject for this ledger and the reason they are numbered here rather than kept in the project that produced them.*

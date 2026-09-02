@@ -104,7 +104,7 @@ You can measure all three on your own agent this week without a vendor dashboard
 
 | Path | Contents |
 |---|---|
-| [`spec/`](spec/) | The canonical specification, v1.1, markdown and PDF |
+| [`spec/`](spec/) | The canonical specification, v1.2 current, with v1.1 kept alongside so existing citations keep resolving. PDF is v1.1's |
 | [`preregistrations/`](preregistrations/) | The full pre-registration series. Every amendment dated before the run it governs |
 | [`results/`](results/) | Study design and measured run output |
 | [`runs/`](runs/) | Run records and dashboards, six experiment phases |
@@ -136,7 +136,7 @@ measurement device and needs its own error model.
 before publication. A result on a model a reader cannot access or price is a demo, not
 evidence.
 
-**An eleven-entry ledger of self-caught defects.** Including the trap that fooled the frontier
+**An append-only ledger of self-caught defects.** Including the trap that fooled the frontier
 model 3 of 3 times, and the run where a 4-bit quantized 3B model passed cells its own fp16
 parent failed. Capability is per-workload, not per-parameter-count.
 
@@ -174,7 +174,7 @@ in full, before the runs they score. A rubric published after the result is not 
 
 - Plain-language writeup: [Same Model, Same Question, 4.68× the Tokens](https://medium.com/@michael_valderrama/same-model-same-question-4-68x-the-tokens-455725b06add)
 - Full methodology and white paper: [The Cost of a Question](https://bucketbranch.ai/papers/cost-of-a-question/)
-- System architecture reference (v2.1.0): [Agentic Architecture for Enterprise Asset Management](https://bucketbranch.ai/papers/agentic-architecture-enterprise-eam/)
+- System architecture reference (v2.1.1): [Agentic Architecture for Enterprise Asset Management](https://bucketbranch.ai/papers/agentic-architecture-enterprise-eam/)
 - Agent-loop economics reference: [bucketbranch.ai/reference/agent-loop-economics](https://bucketbranch.ai/reference/agent-loop-economics/)
 
 ---

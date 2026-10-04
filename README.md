@@ -9,6 +9,7 @@
 [![Vendors](https://img.shields.io/badge/validated-2%20vendors-E8B54D?style=flat-square)](results/aeq_dual_results.txt)
 [![License](https://img.shields.io/badge/license-MIT-8FA3B8?style=flat-square)](LICENSE)
 [![Writeup](https://img.shields.io/badge/writeup-Medium-0E1620?style=flat-square)](https://medium.com/@michael_valderrama/same-model-same-question-4-68x-the-tokens-455725b06add)
+[![Canonical](https://img.shields.io/badge/canonical-bucketbranch.ai-3FD0C9?style=flat-square)](https://bucketbranch.ai/framework/aeq/)
 
 </div>
 
